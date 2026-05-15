@@ -11,20 +11,22 @@ impl DependencyMap {
         format!("{:?}", self.as_ref())
     }
 
-    pub fn dependencies(&self, dep_of: String) -> Vec<String> {
-        let uuid = Uuid::parse_str(&dep_of).unwrap();
-        self.as_ref()
+    pub fn dependencies(&self, dep_of: String) -> PyResult<Vec<String>> {
+        let uuid = Uuid::parse_str(&dep_of)
+            .map_err(|_| pyo3::exceptions::PyValueError::new_err("Invalid UUID"))?;
+        Ok(self.as_ref()
             .dependencies(uuid)
             .map(|uuid| uuid.into())
-            .collect()
+            .collect())
     }
 
-    pub fn dependents(&self, dep_on: String) -> Vec<String> {
-        let uuid = Uuid::parse_str(&dep_on).unwrap();
-        self.as_ref()
+    pub fn dependents(&self, dep_on: String) -> PyResult<Vec<String>> {
+        let uuid = Uuid::parse_str(&dep_on)
+            .map_err(|_| pyo3::exceptions::PyValueError::new_err("Invalid UUID"))?;
+        Ok(self.as_ref()
             .dependents(uuid)
             .map(|uuid| uuid.into())
-            .collect()
+            .collect())
     }
 }
 

@@ -3,17 +3,20 @@ requires = ["maturin>=1.5,<2.0"]
 build-backend = "maturin"
 
 [project]
-name = "taskchampion-py"
-version = "3.0.1.1"
+name = "taskchampion3-py-fork"
+version = "3.0.1.1.dev1"
 requires-python = ">=3.9"
+description = "Python bindings for TaskChampion 3.x (fork, updated for taskchampion=3.0.1)"
 classifiers = [
     "Programming Language :: Rust",
     "Programming Language :: Python :: Implementation :: CPython",
     "Programming Language :: Python :: Implementation :: PyPy",
 ]
+keywords = ["taskwarrior", "taskchampion", "tasks", "productivity"]
 authors = [
     {name = "Illya Laifu", email="illyalaifu@gmail.com"},
     {name = "Dustin J. Mitchell", email="dustin@v.igoro.us"},
+    {name = "sznicolas", email="sznicolas+@users.noreply.github.com"},
 ]
 license = {file = "LICENSE"}
 readme = "README.md"
@@ -26,20 +29,8 @@ changelog = "https://github.com/GothenburgBitFactory/taskchampion-py/releases"
 [tool.maturin]
 features = ["pyo3/extension-module", "server-local"]
 
-[tool.poetry]
-name = "taskchampion-py"
-version = "0.1.0"
-authors = ["illyalaifu <illyalaifu@gmail.com>"]
-description = ""
-package-mode = false
-
-[tool.poetry.dependencies]
-python = ">=3.9"
-maturin = { extras = ["patchelf"], version = "^1.5.1" }
-
-[tool.poetry.group.test.dependencies]
-pytest = "^8.2.0"
-mypy = "^1.10.0"
+[project.optional-dependencies]
+test = ["pytest>=8.2.0", "mypy>=1.10.0"]
 
 [tool.black]
 line-length = 88

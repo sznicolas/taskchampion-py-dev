@@ -83,3 +83,12 @@ def test_taskdata_delete(replica: Replica, new_task_data: TaskData, new_task_uui
 
     deleted_task = replica.get_task(new_task_uuid)
     assert deleted_task is None
+
+
+def test_taskdata_properties(recurring_task_data: TaskData):
+    assert "status" in recurring_task_data.properties()
+
+
+def test_taskdata_items(recurring_task_data: TaskData):
+    items = dict(recurring_task_data.items())
+    assert items["status"] == "recurring"

@@ -42,8 +42,10 @@ impl WorkingSet {
         self.0.by_index(index).map(|uuid| uuid.into())
     }
 
-    pub fn by_uuid(&self, uuid: String) -> Option<usize> {
-        self.0.by_uuid(Uuid::parse_str(&uuid).unwrap())
+    pub fn by_uuid(&self, uuid: String) -> PyResult<Option<usize>> {
+        let u = Uuid::parse_str(&uuid)
+            .map_err(|_| pyo3::exceptions::PyValueError::new_err("Invalid UUID"))?;
+        Ok(self.0.by_uuid(u))
     }
 
     fn __iter__(slf: PyRef<'_, Self>) -> PyResult<Py<WorkingSetIter>> {

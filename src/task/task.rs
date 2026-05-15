@@ -74,12 +74,14 @@ impl Task {
         self.0.get_annotations().map(Annotation::from).collect()
     }
 
-    pub fn get_uda(&self, namespace: &str, key: &str) -> Option<&str> {
-        self.0.get_uda(namespace, key)
+    /// Get the named user-defined attribute (UDA). Returns `None` for task model keys.
+    pub fn get_user_defined_attribute(&self, key: &str) -> Option<&str> {
+        self.0.get_user_defined_attribute(key)
     }
 
-    pub fn get_udas(&self) -> Vec<((&str, &str), &str)> {
-        self.0.get_udas().collect()
+    /// Get all user-defined attributes (UDAs) as a list of `(key, value)` tuples.
+    pub fn get_user_defined_attributes(&self) -> Vec<(&str, &str)> {
+        self.0.get_user_defined_attributes().collect()
     }
 
     pub fn get_modified(&self) -> Option<DateTime<Utc>> {
@@ -203,66 +205,7 @@ impl Task {
             .map_err(into_runtime_error)
     }
 
-    pub fn set_uda(
-        &mut self,
-        namespace: String,
-        key: String,
-        value: String,
-        ops: &mut Operations,
-    ) -> PyResult<()> {
-        self.0
-            .set_uda(namespace, key, value, ops.as_mut())
-            .map_err(into_runtime_error)
-    }
-
-    pub fn remove_uda(
-        &mut self,
-        namespace: String,
-        key: String,
-        ops: &mut Operations,
-    ) -> PyResult<()> {
-        self.0
-            .remove_uda(namespace, key, ops.as_mut())
-            .map_err(into_runtime_error)
-    }
-
-    pub fn set_legacy_uda(
-        &mut self,
-        key: String,
-        value: String,
-        ops: &mut Operations,
-    ) -> PyResult<()> {
-        self.0
-            .set_legacy_uda(key, value, ops.as_mut())
-            .map_err(into_runtime_error)
-    }
-
-    pub fn remove_legacy_uda(&mut self, key: String, ops: &mut Operations) -> PyResult<()> {
-        self.0
-            .remove_legacy_uda(key, ops.as_mut())
-            .map_err(into_runtime_error)
-    }
-
-    pub fn delete(&mut self, ops: &mut Operations) -> PyResult<()> {
-        self.0.delete(ops.as_mut()).map_err(into_runtime_error)
-    }
-
-    pub fn get_legacy_uda(&self, key: &str) -> Option<&str> {
-        self.0.get_legacy_uda(key)
-    }
-
-    pub fn get_legacy_udas(&self) -> Vec<(&str, &str)> {
-        self.0.get_legacy_udas().collect()
-    }
-
-    pub fn get_user_defined_attribute(&self, key: &str) -> Option<&str> {
-        self.0.get_user_defined_attribute(key)
-    }
-
-    pub fn get_user_defined_attributes(&self) -> Vec<(&str, &str)> {
-        self.0.get_user_defined_attributes().collect()
-    }
-
+    /// Set a user-defined attribute (UDA). Fails if `key` is a reserved task model property.
     pub fn set_user_defined_attribute(
         &mut self,
         key: String,
@@ -274,6 +217,7 @@ impl Task {
             .map_err(into_runtime_error)
     }
 
+    /// Remove a user-defined attribute (UDA). Fails if `key` is a reserved task model property.
     pub fn remove_user_defined_attribute(
         &mut self,
         key: String,

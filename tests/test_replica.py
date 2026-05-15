@@ -2,7 +2,7 @@ import uuid
 from pathlib import Path
 
 import pytest
-from taskchampion import AccessMode, Operation, Operations, Replica
+from taskchampion import AccessMode, Operation, Operations, Replica, Status
 
 
 @pytest.fixture
@@ -118,3 +118,42 @@ def test_num_undo_points(replica_with_tasks: Replica):
     replica_with_tasks.commit_operations(ops)
 
     assert replica_with_tasks.num_undo_points() == 1
+
+
+def test_pending_tasks(empty_replica: Replica):
+    ops = Operations()
+    t1 = empty_replica.create_task(str(uuid.uuid4()), ops)
+    t1.set_status(Status.Pending, ops)
+    t2 = empty_replica.create_task(str(uuid.uuid4()), ops)
+    t2.set_status(Status.Completed, ops)
+    empty_replica.commit_operations(ops)
+
+    pending = empty_replica.pending_tasks()
+    assert len(pending) == 1
+    assert pending[0].get_uuid() == t1.get_uuid()
+
+
+def test_pending_task_data(empty_replica: Replica):
+    ops = Operations()
+    t1 = empty_replica.create_task(str(uuid.uuid4()), ops)
+    t1.set_status(Status.Pending, ops)
+    t2 = empty_replica.create_task(str(uuid.uuid4()), ops)
+    t2.set_status(Status.Completed, ops)
+    empty_replica.commit_operations(ops)
+
+    pending = empty_replica.pending_task_data()
+    assert len(pending) == 1
+    assert pending[0].get_uuid() == t1.get_uuid()
+
+
+def test_get_task_operations(empty_replica: Replica):
+    u = str(uuid.uuid4())
+    ops = Operations()
+    t = empty_replica.create_task(u, ops)
+    t.set_status(Status.Pending, ops)
+    t.set_description("hello", ops)
+    empty_replica.commit_operations(ops)
+
+    task_ops = empty_replica.get_task_operations(u)
+    assert len(task_ops) > 0
+    assert any(op.is_create() for op in (task_ops[i] for i in range(len(task_ops))))
