@@ -1,6 +1,7 @@
-from taskchampion import Operation
 from datetime import datetime
+
 import pytest
+from taskchampion import Operation
 
 
 def test_create():
@@ -84,8 +85,8 @@ def test_update_none():
         repr(o)
         == 'Update { uuid: 10c52749-aec7-4ec9-b390-f371883b9605, property: "foo", old_value: None, value: None, timestamp: 2038-01-19T03:14:07Z }'
     )
-    assert o.old_value == None
-    assert o.value == None
+    assert o.old_value is None
+    assert o.value is None
 
 
 def test_undo_point():

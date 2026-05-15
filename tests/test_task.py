@@ -1,8 +1,9 @@
 import re
-from taskchampion import Task, Replica, Status, Tag, Operations, Annotation
-from datetime import datetime
-import pytest
 import uuid
+from datetime import datetime
+
+import pytest
+from taskchampion import Annotation, Operations, Replica, Status, Tag, Task
 
 
 @pytest.fixture
@@ -185,7 +186,7 @@ def test_get_set_entry_none(replica: Replica, new_task: Task):
     new_task.set_entry(None, ops)
     replica.commit_operations(ops)
     new_task = replica.get_task(new_task.get_uuid())
-    assert new_task.get_entry() == None
+    assert new_task.get_entry() is None
 
 
 def test_get_set_priority(waiting_task: Task):
@@ -339,7 +340,7 @@ def test_get_modified_not_set(replica: Replica, new_task_uuid: Task):
     ops = Operations()
     task = replica.create_task(new_task_uuid, ops)
     replica.commit_operations(ops)
-    assert task.get_modified() == None
+    assert task.get_modified() is None
 
 
 def test_get_due(due_task: Task):
@@ -347,7 +348,7 @@ def test_get_due(due_task: Task):
 
 
 def test_get_due_not_set(new_task: Task):
-    assert new_task.get_due() == None
+    assert new_task.get_due() is None
 
 
 def test_set_due(replica: Replica, new_task: Task):
@@ -362,7 +363,7 @@ def test_set_due_none(replica: Replica, new_task: Task):
     ops = Operations()
     new_task.set_due(None, ops)
     replica.commit_operations(ops)
-    assert new_task.get_due() == None
+    assert new_task.get_due() is None
 
 
 def test_get_dependencies(
@@ -393,7 +394,7 @@ def test_get_value(new_task: Task):
 
 
 def test_get_value_not_set(new_task: Task):
-    assert new_task.get_value("nosuchthing") == None
+    assert new_task.get_value("nosuchthing") is None
 
 
 def test_start_stop(replica: Replica, new_task: Task):

@@ -1,6 +1,6 @@
 import uuid
-import pytest
-from taskchampion import Replica, TaskData, Operations
+
+from taskchampion import Operations, Replica, TaskData
 
 
 def test_dependency_map():

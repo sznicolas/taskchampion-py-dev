@@ -2,7 +2,7 @@ import uuid
 from pathlib import Path
 
 import pytest
-from taskchampion import Replica, Operations, Operation, AccessMode
+from taskchampion import AccessMode, Operation, Operations, Replica
 
 
 @pytest.fixture

@@ -1,6 +1,7 @@
-from taskchampion import Operation, Operations, TaskData
 import uuid
+
 import pytest
+from taskchampion import Operation, Operations, TaskData
 
 
 @pytest.fixture

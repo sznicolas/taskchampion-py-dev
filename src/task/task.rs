@@ -243,6 +243,47 @@ impl Task {
             .map_err(into_runtime_error)
     }
 
+    pub fn delete(&mut self, ops: &mut Operations) -> PyResult<()> {
+        self.0.delete(ops.as_mut()).map_err(into_runtime_error)
+    }
+
+    pub fn get_legacy_uda(&self, key: &str) -> Option<&str> {
+        self.0.get_legacy_uda(key)
+    }
+
+    pub fn get_legacy_udas(&self) -> Vec<(&str, &str)> {
+        self.0.get_legacy_udas().collect()
+    }
+
+    pub fn get_user_defined_attribute(&self, key: &str) -> Option<&str> {
+        self.0.get_user_defined_attribute(key)
+    }
+
+    pub fn get_user_defined_attributes(&self) -> Vec<(&str, &str)> {
+        self.0.get_user_defined_attributes().collect()
+    }
+
+    pub fn set_user_defined_attribute(
+        &mut self,
+        key: String,
+        value: String,
+        ops: &mut Operations,
+    ) -> PyResult<()> {
+        self.0
+            .set_user_defined_attribute(key, value, ops.as_mut())
+            .map_err(into_runtime_error)
+    }
+
+    pub fn remove_user_defined_attribute(
+        &mut self,
+        key: String,
+        ops: &mut Operations,
+    ) -> PyResult<()> {
+        self.0
+            .remove_user_defined_attribute(key, ops.as_mut())
+            .map_err(into_runtime_error)
+    }
+
     pub fn add_dependency(&mut self, dep: String, ops: &mut Operations) -> PyResult<()> {
         self.0
             .add_dependency(uuid2tc(dep)?, ops.as_mut())

@@ -1,19 +1,21 @@
 [package]
 name = "taskchampion-py"
-version = "2.0.2"
+version = "3.0.1"
 edition = "2021"
 # This should match the MSRV of the `taskchampion` crate.
-rust-version = "1.83.0"
+rust-version = "1.91.1"
 
 [features]
 default = ["sync"]
 
 # Support for all sync solutions
-sync = ["server-sync", "server-gcp"]
+sync = ["server-sync", "server-gcp", "server-local"]
 # Support for sync to a server
 server-sync = ["taskchampion/server-sync"]
 # Support for sync to GCP
 server-gcp = ["taskchampion/server-gcp"]
+# Support for local directory sync
+server-local = ["taskchampion/server-local"]
 
 [package.metadata.maturin]
 name = "taskchampion"
@@ -26,4 +28,6 @@ doc = false
 [dependencies]
 pyo3 = { version = "0.28", features = ["chrono"] }
 chrono = "*"
-taskchampion = { version = "=2.0.2", default-features = false, features = ["bundled"] }
+taskchampion = { version = "=3.0.1", default-features = false, features = ["storage-sqlite", "bundled", "server-local", "server-sync", "server-gcp", "tls-webpki-roots"] }
+tokio = { version = "1", features = ["rt"] }
+tempfile = "3"

@@ -4,7 +4,7 @@ build-backend = "maturin"
 
 [project]
 name = "taskchampion-py"
-version = "2.0.2.1"
+version = "3.0.1.1"
 requires-python = ">=3.9"
 classifiers = [
     "Programming Language :: Rust",
@@ -24,7 +24,7 @@ repository = "https://github.com/GothenburgBitFactory/taskchampion-py"
 changelog = "https://github.com/GothenburgBitFactory/taskchampion-py/releases"
 
 [tool.maturin]
-features = ["pyo3/extension-module"]
+features = ["pyo3/extension-module", "server-local"]
 
 [tool.poetry]
 name = "taskchampion-py"

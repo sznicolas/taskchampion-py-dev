@@ -29,6 +29,14 @@ impl TaskData {
         self.0.has(value)
     }
 
+    pub fn properties(&self) -> Vec<String> {
+        self.0.properties().cloned().collect()
+    }
+
+    pub fn items(&self) -> Vec<(String, String)> {
+        self.0.iter().map(|(k, v)| (k.clone(), v.clone())).collect()
+    }
+
     #[pyo3(signature=(property, value, ops))]
     pub fn update(&mut self, property: String, value: Option<String>, ops: &mut Operations) {
         self.0.update(property, value, ops.as_mut());
