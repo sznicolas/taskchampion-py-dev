@@ -5,8 +5,7 @@ It follows the TaskChampion API closely, with minimal adaptation for Python.
 
 ## Versioning
 
-The `taskchampion-py` package version matches the Rust crate's version.
-When an additional package release is required for the same Rust crate, a fourth version component is used; for example `1.2.0.1` for the second release of `taskchampion-py` containing TaskChampion version `1.2.0`.
+The `taskchampion-py` package version generally follows the Rust crate version. This fork publishes as `taskchampion3-py-fork` with Python package version 3.0.1.1.dev1 corresponding to TaskChampion crate 3.0.1. When an additional package-only release is required for the same Rust crate, a fourth version component is used (e.g., `1.2.0.1`).
 
 ## Usage
 
@@ -25,7 +24,7 @@ def main():
 if __name__ == "__main__":
     main()
 ```
-For the Replica.new_on_disk(path), the argument is directory to your sqlite database (to match the Rust implementation). For a thorough understanding of the Rust implementation, which this Python package emulates, see the Rust documentation at: https://docs.rs/taskchampion/2.0.3/taskchampion/
+For the Replica.new_on_disk(path), the argument is directory to your sqlite database (to match the Rust implementation). For a thorough understanding of the Rust implementation, which this Python package emulates, see the Rust documentation at: https://docs.rs/taskchampion/3.0.1/taskchampion/
 
 The output of r.all_tasks() is a dictionary. The keys are the UUIDs of the tasks. Here is an example based on a couple test tasks:
 
@@ -67,19 +66,16 @@ This stores wheels in the `target/wheels` folder by default.
 
 ### Testing
 
-Extra testing dependencies are installed via `poetry`:
-```shell
-poetry install
-```
+Extra testing dependencies can be installed with pip. To run tests locally:
 
-To run tests:
-```shell
-poetry shell
-maturin develop
+```bash
+python3.12 -m venv .venv && source .venv/bin/activate
+python -m pip install --upgrade pip
+pip install maturin pytest mypy
+# Build and install extension in editable mode
+maturin develop --release
+# Run tests
 pytest
 ```
-or
-```shell
-poetry run maturin develop
-poetry run pytest
-```
+
+To reproduce the CI environment (ubuntu-latest) use the Docker recipe in the CONTRIBUTING or CI docs.

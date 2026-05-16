@@ -339,7 +339,7 @@ def test_get_modified(replica: Replica, new_task: Task):
     assert new_task.get_modified() == mod
 
 
-def test_get_modified_not_set(replica: Replica, new_task_uuid: Task):
+def test_get_modified_not_set(replica: Replica, new_task_uuid: str):
     ops = Operations()
     task = replica.create_task(new_task_uuid, ops)
     replica.commit_operations(ops)
