@@ -3,7 +3,7 @@ requires = ["maturin>=1.5,<2.0"]
 build-backend = "maturin"
 
 [project]
-name = "taskchampion3-py-fork"
+name = "taskchampion3-py-dev"
 version = "3.0.1.1.1a1"
 requires-python = ">=3.9"
 description = "Python bindings for TaskChampion 3.x (fork, updated for taskchampion=3.0.1)"
