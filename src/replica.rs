@@ -45,7 +45,11 @@ impl Replica {
     ) -> PyResult<Replica> {
         let rt = build_runtime()?;
         let storage = rt
-            .block_on(SqliteStorage::new(path, access_mode.into(), create_if_missing))
+            .block_on(SqliteStorage::new(
+                path,
+                access_mode.into(),
+                create_if_missing,
+            ))
             .map_err(into_runtime_error)?;
         Ok(Replica {
             inner: TCReplica::new(storage),

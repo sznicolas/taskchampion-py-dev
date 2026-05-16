@@ -27,7 +27,7 @@ jobs:
 
       - uses: actions-rs/toolchain@v1
         with:
-          toolchain: "1.83.0" # MSRV
+          toolchain: "1.91.1" # MSRV
           override: true
           components: clippy
 
@@ -51,7 +51,7 @@ jobs:
         with:
           profile: minimal
           components: rustfmt
-          toolchain: stable
+          toolchain: "1.91.1"
           override: true
 
       - uses: actions-rs/cargo@v1.0.3

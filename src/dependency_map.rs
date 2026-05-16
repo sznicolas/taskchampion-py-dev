@@ -14,7 +14,8 @@ impl DependencyMap {
     pub fn dependencies(&self, dep_of: String) -> PyResult<Vec<String>> {
         let uuid = Uuid::parse_str(&dep_of)
             .map_err(|_| pyo3::exceptions::PyValueError::new_err("Invalid UUID"))?;
-        Ok(self.as_ref()
+        Ok(self
+            .as_ref()
             .dependencies(uuid)
             .map(|uuid| uuid.into())
             .collect())
@@ -23,7 +24,8 @@ impl DependencyMap {
     pub fn dependents(&self, dep_on: String) -> PyResult<Vec<String>> {
         let uuid = Uuid::parse_str(&dep_on)
             .map_err(|_| pyo3::exceptions::PyValueError::new_err("Invalid UUID"))?;
-        Ok(self.as_ref()
+        Ok(self
+            .as_ref()
             .dependents(uuid)
             .map(|uuid| uuid.into())
             .collect())
