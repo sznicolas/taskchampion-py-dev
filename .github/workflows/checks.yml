@@ -25,21 +25,16 @@ jobs:
           path: target
           key: ${{ runner.os }}-cargo-build-target-${{ hashFiles('**/Cargo.lock') }}
 
-      - uses: actions-rs/toolchain@v1
+      - uses: dtolnay/rust-toolchain@master
         with:
           toolchain: "1.91.1" # MSRV
-          override: true
           components: clippy
 
-      - uses: actions-rs/cargo@v1.0.3
-        with:
-          command: check
+      - name: Check
+        run: cargo check
 
-      - uses: actions-rs/clippy-check@v1
-        with:
-          token: ${{ secrets.GITHUB_TOKEN }}
-          args: --all-features --no-deps -- -D warnings
-          name: "Clippy Results"
+      - name: Clippy
+        run: cargo clippy --all-features --no-deps -- -D warnings
 
   fmt:
     runs-on: ubuntu-latest
@@ -47,17 +42,13 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
-      - uses: actions-rs/toolchain@v1
+      - uses: dtolnay/rust-toolchain@master
         with:
-          profile: minimal
           components: rustfmt
           toolchain: "1.91.1"
-          override: true
 
-      - uses: actions-rs/cargo@v1.0.3
-        with:
-          command: fmt
-          args: --all -- --check
+      - name: Rustfmt
+        run: cargo fmt --all -- --check
 
   black:
     runs-on: ubuntu-latest
