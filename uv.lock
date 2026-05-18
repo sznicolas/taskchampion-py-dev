@@ -395,8 +395,8 @@ wheels = [
 ]
 
 [[package]]
-name = "taskchampion3-py-fork"
-version = "3.0.1.1.dev1"
+name = "taskchampion3-py-dev"
+version = "3.0.1.1.1a1"
 source = { editable = "." }
 
 [package.optional-dependencies]
