@@ -97,9 +97,9 @@ jobs:
     strategy:
       matrix:
         include:
-          - target: x86_64-pc-windows-msvc
+          - target: windows-latest
             arch: x64
-          - target: i686-pc-windows-msvc
+          - target: windows-latest
             arch: x86
 
     steps:
