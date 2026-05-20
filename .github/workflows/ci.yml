@@ -91,37 +91,37 @@ jobs:
           name: wheels-musllinux-${{ matrix.target }}
           path: dist
 
-#  windows:
-#    if: ${{ github.event_name == 'pull_request' || startsWith(github.ref, 'refs/heads/main') || startsWith(github.ref, 'refs/tags/') }}
-#    runs-on: windows-latest
-#    strategy:
-#      matrix:
-#        include:
-#          - target: windows-latest
-#            arch: x64
-#          - target: windows-latest
-#            arch: x86
-#
-#    steps:
-#      - uses: actions/checkout@v4
-#
-#      - uses: actions/setup-python@v5
-#        with:
-#          python-version: 3.12
-#          architecture: ${{ matrix.arch }}
-#
-#      - name: Build wheels
-#        uses: PyO3/maturin-action@v1
-#        with:
-#          target: ${{ matrix.target }}
-#          args: --release --out dist --find-interpreter --zig
-#          sccache: 'true'
-#
-#      - name: Upload wheels
-#        uses: actions/upload-artifact@v4
-#        with:
-#          name: wheels-windows-${{ matrix.target }}
-#          path: dist
+  windows:
+    if: ${{ github.event_name == 'pull_request' || startsWith(github.ref, 'refs/heads/main') || startsWith(github.ref, 'refs/tags/') }}
+    runs-on: windows-latest
+    strategy:
+      matrix:
+        include:
+          - target: windows-latest
+            arch: x64
+          - target: windows-latest
+            arch: x86
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: 3.12
+          architecture: ${{ matrix.arch }}
+
+      - name: Build wheels
+        uses: PyO3/maturin-action@v1
+        with:
+          target: ${{ matrix.target }}
+          args: --release --out dist --find-interpreter --zig
+          sccache: 'true'
+
+      - name: Upload wheels
+        uses: actions/upload-artifact@v4
+        with:
+          name: wheels-windows-${{ matrix.target }}
+          path: dist
 
   macos:
     if: ${{ github.event_name == 'pull_request' || startsWith(github.ref, 'refs/heads/main') || startsWith(github.ref, 'refs/tags/') }}
@@ -129,7 +129,7 @@ jobs:
     strategy:
       matrix:
         include:
-          - runner: macos-13  # Intel
+          - runner: macos-latest  # Intel
             target: x86_64-apple-darwin
           - runner: macos-latest  # Apple Silicon
             target: aarch64-apple-darwin
