@@ -90,16 +90,15 @@ jobs:
         with:
           name: wheels-musllinux-${{ matrix.target }}
           path: dist
-
   windows:
     if: ${{ github.event_name == 'pull_request' || startsWith(github.ref, 'refs/heads/main') || startsWith(github.ref, 'refs/tags/') }}
     runs-on: windows-latest
     strategy:
       matrix:
         include:
-          - target: windows-latest
+          - target: x86_64-pc-windows-msvc
             arch: x64
-          - target: windows-latest
+          - target: i686-pc-windows-msvc
             arch: x86
 
     steps:
@@ -175,7 +174,7 @@ jobs:
     name: Release
     runs-on: ubuntu-latest
     if: ${{ startsWith(github.ref, 'refs/tags/') || github.event_name == 'workflow_dispatch' }}
-    needs: [linux, musllinux, macos, sdist] # windows, 
+    needs: [linux, musllinux, macos, windows, sdist]
     permissions:
       id-token: write
       contents: write
