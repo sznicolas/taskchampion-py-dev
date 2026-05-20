@@ -5,7 +5,7 @@ It follows the TaskChampion API closely, with minimal adaptation for Python.
 
 ## Versioning
 
-The `taskchampion-py` package version generally follows the Rust crate version. This fork publishes as `taskchampion3-py-fork` with Python package version 3.0.1.1.dev1 corresponding to TaskChampion crate 3.0.1. When an additional package-only release is required for the same Rust crate, a fourth version component is used (e.g., `1.2.0.1`).
+The `taskchampion-py` package version generally follows the Rust crate version. This fork publishes as `taskchampion3-py-dev` with Python package version 3.0.1.2a1 corresponding to TaskChampion crate 3.0.1. When an additional package-only release is required for the same Rust crate, a fourth version component is used (e.g., `1.2.0.1`).
 
 ## Usage
 
