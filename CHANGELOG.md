@@ -12,9 +12,16 @@ the first three components mirror the upstream `taskchampion` Rust crate.
   the `release` job now requires `test` to pass.
 - PyPI trove classifiers: Python versions 3.9–3.13, MIT License, Development Status,
   Operating System, and Topic.
+- README: dedicated `Installation` section with `pip install --pre taskchampion3-py-dev`,
+  clarification of the PyPI-distribution-name vs Python-module-name distinction, and
+  the list of pre-built wheel platforms.
+- Test `test_set_status_unknown_raises` covering the new `Status.Unknown` write rejection.
 
 ### Changed
 - `chrono` Cargo dependency bounded to `0.4` (was the unbounded `*`).
+- Wheels are now built against the PyO3 stable ABI (`abi3-py39`). A single wheel
+  per platform now covers Python 3.9 and every later 3.x release. Previously,
+  macOS and Windows produced only `cp312` wheels.
 
 ### Fixed
 - `Task.set_status(Status.Unknown, ops)` now raises `ValueError` instead of silently

@@ -7,6 +7,22 @@ It follows the TaskChampion API closely, with minimal adaptation for Python.
 
 The `taskchampion-py` package version generally follows the Rust crate version. This fork publishes as `taskchampion3-py-dev` with Python package version 3.0.1.2a1 corresponding to TaskChampion crate 3.0.1. When an additional package-only release is required for the same Rust crate, a fourth version component is used (e.g., `1.2.0.1`).
 
+## Installation
+
+Install from PyPI. The `--pre` flag is required while this fork is published as a pre-release (`aN` / `devN`):
+
+```shell
+pip install --pre taskchampion3-py-dev
+```
+
+The PyPI distribution name is `taskchampion3-py-dev`, but the importable Python module is `taskchampion`:
+
+```python
+import taskchampion
+```
+
+Pre-built wheels are published for CPython and PyPy on Python 3.9–3.13, covering Linux (glibc and musl: x86_64, aarch64, armv7, i686, s390x, ppc64le), macOS (Intel and Apple Silicon), and Windows (x86, x64). If no wheel matches your platform, pip will fall back to the sdist, which requires a Rust toolchain ≥ 1.91.1.
+
 ## Usage
 
 ```py
