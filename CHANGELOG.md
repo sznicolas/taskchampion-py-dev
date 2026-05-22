@@ -7,6 +7,13 @@ the first three components mirror the upstream `taskchampion` Rust crate.
 
 ## [Unreleased]
 
+## [3.0.1.2] - 2026-05-22
+
+First stable release of the fork. Pins TaskChampion Rust crate `3.0.1` exactly;
+the fork follows the upstream crate version, with the fourth component tracking
+package-only build / packaging revisions. `Development Status` promoted to
+`5 - Production/Stable`.
+
 ### Added
 - CI: new `test` job runs `pytest` against built Linux x86_64 wheels on Python 3.9–3.13;
   the `release` job now requires `test` to pass.

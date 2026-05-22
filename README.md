@@ -5,14 +5,14 @@ It follows the TaskChampion API closely, with minimal adaptation for Python.
 
 ## Versioning
 
-The `taskchampion-py` package version generally follows the Rust crate version. This fork publishes as `taskchampion3-py-dev` with Python package version 3.0.1.2a1 corresponding to TaskChampion crate 3.0.1. When an additional package-only release is required for the same Rust crate, a fourth version component is used (e.g., `1.2.0.1`).
+The `taskchampion-py` package version generally follows the Rust crate version. This fork publishes as `taskchampion3-py-dev` with Python package version `3.0.1.2` corresponding to TaskChampion crate `3.0.1`. The fork remains on the `3.0.1.x` line as long as upstream `taskchampion` stays on `3.0.1`; the `3.0.2.x` line will track upstream `taskchampion 3.0.2` when it ships. The fourth version component is the package-only revision (build/packaging fixes that do not change the wrapped Rust crate).
 
 ## Installation
 
-Install from PyPI. The `--pre` flag is required while this fork is published as a pre-release (`aN` / `devN`):
+Install from PyPI:
 
 ```shell
-pip install --pre taskchampion3-py-dev
+pip install taskchampion3-py-dev
 ```
 
 The PyPI distribution name is `taskchampion3-py-dev`, but the importable Python module is `taskchampion`:
