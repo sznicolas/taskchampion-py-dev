@@ -9,12 +9,21 @@ on:
     tags:
       - '*'
   pull_request:
+  schedule:
+    - cron: '0 12 * * 1'
   workflow_dispatch:
 
 permissions:
   contents: read
 
 jobs:
+  checks:
+    uses: ./.github/workflows/checks.yml
+    permissions:
+      contents: read
+      checks: write
+      issues: write
+
   linux:
     if: ${{ github.event_name == 'pull_request' || startsWith(github.ref, 'refs/heads/main') || startsWith(github.ref, 'refs/tags/') }}
     runs-on: ubuntu-22.04
@@ -206,7 +215,7 @@ jobs:
     name: Release
     runs-on: ubuntu-latest
     if: ${{ startsWith(github.ref, 'refs/tags/') || github.event_name == 'workflow_dispatch' }}
-    needs: [linux, musllinux, macos, windows, sdist, test]
+    needs: [linux, musllinux, macos, windows, sdist, test, checks]
     permissions:
       id-token: write
       contents: write

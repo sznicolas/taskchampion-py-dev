@@ -24,13 +24,11 @@ the first three components mirror the upstream `taskchampion` Rust crate.
 - `Operations` implements `Default` (Rust-side; no Python-visible change).
 - CI: new `audit` job (cargo audit via `rustsec/audit-check@v2.0.0`) runs on push/PR
   and weekly cron (Monday 12h UTC) to catch RustSec advisories on Cargo dependencies.
+  The job declares the `checks: write` and `issues: write` permissions required by
+  `rustsec/audit-check` to post check annotations and open advisory issues.
 - CI: new `mypy` job type-checks `taskchampion.pyi` and `tests/` on every push/PR.
 - `taskchampion.pyi`: `Operations` now declares `__iter__` (previously missing despite
   the underlying `#[pyclass(sequence)]` making instances iterable at runtime).
-
-### Removed
-- `Task.into_task_data()` — renamed to `Task.to_task_data()` to match Python naming
-  conventions (the method does not consume the task; it produces a copy).
 
 ### Changed
 - `chrono` Cargo dependency bounded to `0.4` (was the unbounded `*`).
@@ -49,6 +47,22 @@ the first three components mirror the upstream `taskchampion` Rust crate.
 - Wheels are now built against the PyO3 stable ABI (`abi3-py39`). A single wheel
   per platform now covers Python 3.9 and every later 3.x release. Previously,
   macOS and Windows produced only `cp312` wheels.
+- CI: `checks.yml` is now a reusable workflow (`workflow_call`) invoked from
+  `ci.yml` as a job. The `release` job now `needs: checks`, so clippy / rustfmt /
+  black / mypy / cargo audit all gate a PyPI publish (previously they could be
+  skipped on tag-only pushes).
+- CI: `psf/black` action pinned to `@25.1.0` instead of the floating `@stable`.
+
+### Removed
+- `Task.into_task_data()` — renamed to `Task.to_task_data()` to match Python naming
+  conventions (the method does not consume the task; it produces a copy).
+- Workflow `.github/workflows/publish_released_by_ci.yml` deleted. It was
+  double-broken (used the deprecated `download-artifact@v4 name:` syntax for a
+  cross-workflow download, referenced a non-existent `head_tag` field) and
+  redundant with the `release` job in `ci.yml`, which already handles tag-based
+  publishing with proper attestations. Its trigger also fired on `feat/**`
+  branches and any commit message starting with `chore` — risk of unintended
+  PyPI publish on dev branches.
 
 ### Fixed
 - `Task.set_status(Status.Unknown, ops)` now raises `ValueError` instead of silently
