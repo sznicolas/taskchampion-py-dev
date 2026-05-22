@@ -37,6 +37,15 @@ the first three components mirror the upstream `taskchampion` Rust crate.
 - `mypy.ini`: the `disable_error_code = assignment` suppression is now scoped to
   `[mypy-tests.*]` instead of being global, restoring strict type-checking on
   production code.
+- `Operations.__getitem__` now accepts negative indices and slices. `ops[-1]` returns
+  the last operation; `ops[a:b:s]` returns an `Operations`. Previously `ops[-1]`
+  raised `OverflowError`.
+- `Task.__repr__` and `TaskData.__repr__` now produce Python-idiomatic output
+  (`Task(uuid=..., description=...)`, `TaskData(uuid=...)`) instead of leaking the
+  Rust `Debug` formatter.
+- `WorkingSet` iteration is now lazy (yields entries on demand via `by_index`)
+  instead of materialising a `Vec` of all entries up front. Iteration semantics
+  are unchanged.
 - Wheels are now built against the PyO3 stable ABI (`abi3-py39`). A single wheel
   per platform now covers Python 3.9 and every later 3.x release. Previously,
   macOS and Windows produced only `cp312` wheels.

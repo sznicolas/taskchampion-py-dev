@@ -1,4 +1,3 @@
-import re
 import uuid
 from datetime import datetime
 
@@ -148,10 +147,11 @@ def legacy_uda_task(replica: Replica, legacy_uda_task_uuid: str):
     return task
 
 
-def test_repr(new_task: Task):
-    # The Rust Debug output contains lots of internal details that we do not
-    # need to check for here.
-    assert re.match(r"^Task { .* }$", repr(new_task))
+def test_repr(new_task: Task, new_task_uuid: str):
+    r = repr(new_task)
+    assert r.startswith("Task(uuid=")
+    assert new_task_uuid in r
+    assert 'description="a task"' in r
 
 
 def test_to_task_data(new_task: Task, new_task_uuid: str):

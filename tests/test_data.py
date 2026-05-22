@@ -37,7 +37,7 @@ def recurring_task_data(replica: Replica, recurring_task_uuid: str) -> TaskData:
 
 
 def test_taskdata_repr(new_task_data: TaskData, new_task_uuid: str):
-    assert repr(new_task_data) == f"TaskData {{ uuid: {new_task_uuid}, taskmap: {{}} }}"
+    assert repr(new_task_data) == f'TaskData(uuid="{new_task_uuid}")'
 
 
 def test_taskdata_get_uuid(new_task_data: TaskData, new_task_uuid: str):

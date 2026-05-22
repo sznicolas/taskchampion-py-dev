@@ -1,5 +1,9 @@
 use crate::Operation;
-use pyo3::{exceptions::PyIndexError, prelude::*};
+use pyo3::{
+    exceptions::{PyIndexError, PyTypeError},
+    prelude::*,
+    types::PySlice,
+};
 use taskchampion::Operations as TCOperations;
 
 #[pyclass(from_py_object, sequence)]
@@ -29,11 +33,29 @@ impl Operations {
         self.0.len()
     }
 
-    pub fn __getitem__(&self, i: usize) -> PyResult<Operation> {
-        if i >= self.0.len() {
-            return Err(PyIndexError::new_err("Invalid operation index"));
+    pub fn __getitem__(&self, py: Python<'_>, key: &Bound<'_, PyAny>) -> PyResult<Py<PyAny>> {
+        let len = self.0.len() as isize;
+
+        if let Ok(slice) = key.cast::<PySlice>() {
+            let indices = slice.indices(len)?;
+            let mut result = TCOperations::new();
+            let mut i = indices.start;
+            for _ in 0..indices.slicelength {
+                result.push(self.0[i as usize].clone());
+                i += indices.step;
+            }
+            Ok(Py::new(py, Operations(result))?.into_any())
+        } else if let Ok(idx) = key.extract::<isize>() {
+            let normalized = if idx < 0 { idx + len } else { idx };
+            if normalized < 0 || normalized >= len {
+                return Err(PyIndexError::new_err("operation index out of range"));
+            }
+            Ok(Py::new(py, Operation(self.0[normalized as usize].clone()))?.into_any())
+        } else {
+            Err(PyTypeError::new_err(
+                "Operations indices must be integers or slices",
+            ))
         }
-        Ok(Operation(self.0[i].clone()))
     }
 }
 

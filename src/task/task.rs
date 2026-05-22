@@ -14,7 +14,11 @@ pub struct Task(TCTask);
 #[pymethods]
 impl Task {
     fn __repr__(&self) -> String {
-        format!("{:?}", self.as_ref())
+        format!(
+            "Task(uuid={:?}, description={:?})",
+            self.0.get_uuid().to_string(),
+            self.0.get_description(),
+        )
     }
 
     pub fn to_task_data(&self) -> TaskData {

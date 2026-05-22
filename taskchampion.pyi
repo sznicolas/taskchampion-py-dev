@@ -1,7 +1,7 @@
 from collections.abc import Iterator
 from datetime import datetime
 from enum import Enum
-from typing import final
+from typing import final, overload
 
 __all__ = [
     "Replica",
@@ -95,7 +95,10 @@ class Operations:
     def __new__(cls) -> "Operations": ...
     def append(self, op: Operation) -> None: ...
     def __len__(self) -> int: ...
+    @overload
     def __getitem__(self, i: int, /) -> Operation: ...
+    @overload
+    def __getitem__(self, s: slice, /) -> "Operations": ...
     def __iter__(self) -> Iterator[Operation]: ...
 
 @final

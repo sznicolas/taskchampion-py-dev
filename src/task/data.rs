@@ -14,7 +14,8 @@ impl TaskData {
     }
 
     pub fn __repr__(&self) -> String {
-        format!("{:?}", self.0)
+        let uuid: String = self.0.get_uuid().into();
+        format!("TaskData(uuid={uuid:?})")
     }
 
     pub fn get_uuid(&self) -> String {
