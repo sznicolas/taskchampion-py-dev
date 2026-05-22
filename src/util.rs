@@ -4,7 +4,7 @@ use pyo3::{
 };
 use taskchampion::Uuid;
 
-/// Covert a strong from Python into a Rust Uuid.
+/// Convert a string from Python into a Rust Uuid.
 pub(crate) fn uuid2tc(s: impl AsRef<str>) -> PyResult<Uuid> {
     Uuid::parse_str(s.as_ref()).map_err(|_| PyValueError::new_err("Invalid UUID"))
 }

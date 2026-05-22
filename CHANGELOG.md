@@ -16,6 +16,13 @@ the first three components mirror the upstream `taskchampion` Rust crate.
   clarification of the PyPI-distribution-name vs Python-module-name distinction, and
   the list of pre-built wheel platforms.
 - Test `test_set_status_unknown_raises` covering the new `Status.Unknown` write rejection.
+- `Annotation` is now hashable (consistent with `Tag`) — instances can be used as
+  `set()` elements or `dict` keys.
+- `Operations` implements `Default` (Rust-side; no Python-visible change).
+
+### Removed
+- `Task.into_task_data()` — renamed to `Task.to_task_data()` to match Python naming
+  conventions (the method does not consume the task; it produces a copy).
 
 ### Changed
 - `chrono` Cargo dependency bounded to `0.4` (was the unbounded `*`).

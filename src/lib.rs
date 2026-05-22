@@ -1,17 +1,15 @@
-#![allow(clippy::new_without_default)]
-
 use pyo3::prelude::*;
-pub mod replica;
+mod replica;
 use replica::*;
-pub mod working_set;
+mod working_set;
 use working_set::*;
-pub mod dependency_map;
+mod dependency_map;
 use dependency_map::*;
-pub mod operation;
+mod operation;
 use operation::*;
-pub mod access_mode;
+mod access_mode;
 use access_mode::*;
-pub mod operations;
+mod operations;
 use operations::*;
 mod task;
 use task::{Annotation, Status, Tag, Task, TaskData};

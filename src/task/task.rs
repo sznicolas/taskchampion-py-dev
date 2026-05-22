@@ -17,8 +17,7 @@ impl Task {
         format!("{:?}", self.as_ref())
     }
 
-    #[allow(clippy::wrong_self_convention)]
-    pub fn into_task_data(&self) -> TaskData {
+    pub fn to_task_data(&self) -> TaskData {
         self.0.clone().into_task_data().into()
     }
 

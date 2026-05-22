@@ -154,8 +154,8 @@ def test_repr(new_task: Task):
     assert re.match(r"^Task { .* }$", repr(new_task))
 
 
-def test_into_task_data(new_task: Task, new_task_uuid: str):
-    new_task = new_task.into_task_data()
+def test_to_task_data(new_task: Task, new_task_uuid: str):
+    new_task = new_task.to_task_data()
     assert new_task.get_uuid() == new_task_uuid
 
 

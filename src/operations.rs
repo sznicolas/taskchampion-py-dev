@@ -3,7 +3,7 @@ use pyo3::{exceptions::PyIndexError, prelude::*};
 use taskchampion::Operations as TCOperations;
 
 #[pyclass(from_py_object, sequence)]
-#[derive(PartialEq, Eq, Clone, Debug)]
+#[derive(PartialEq, Eq, Clone, Debug, Default)]
 /// A sequence of Operations.
 ///
 /// This is a list-like type, and can be indexed, iterated over, and so on like any

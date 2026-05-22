@@ -18,6 +18,11 @@ type TCReplicaSqlite = TCReplica<SqliteStorage>;
 /// All Rust `Replica` methods are async; this binding bridges them synchronously using a
 /// dedicated single-threaded Tokio runtime (`block_on`). This keeps the Python API simple
 /// and avoids requiring `asyncio` on the caller side.
+///
+/// `Task` and `TaskData` objects returned by the replica are independent snapshots: a
+/// mutation made via one handle (e.g. `task.set_status(...)` followed by
+/// `replica.commit_operations(...)`) is not reflected in other handles to the same UUID
+/// until they are re-fetched (e.g. with `replica.get_task(uuid)`).
 pub struct Replica {
     inner: TCReplicaSqlite,
     rt: tokio::runtime::Runtime,
