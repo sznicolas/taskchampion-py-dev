@@ -168,6 +168,12 @@ def test_get_set_status(new_task: Task):
     assert status == Status.Pending
 
 
+def test_set_status_unknown_raises(new_task: Task):
+    ops = Operations()
+    with pytest.raises(ValueError, match="Status.Unknown"):
+        new_task.set_status(Status.Unknown, ops)
+
+
 def test_get_set_description(new_task: Task):
     assert new_task.get_description() == "a task"
 

@@ -170,11 +170,43 @@ jobs:
           name: wheels-sdist
           path: dist
 
+  test:
+    name: Test Python ${{ matrix.python-version }}
+    if: ${{ github.event_name == 'pull_request' || startsWith(github.ref, 'refs/heads/main') || startsWith(github.ref, 'refs/tags/') }}
+    runs-on: ubuntu-22.04
+    needs: linux
+    strategy:
+      fail-fast: false
+      matrix:
+        python-version: ['3.9', '3.10', '3.11', '3.12', '3.13']
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: ${{ matrix.python-version }}
+
+      - name: Download Linux x86_64 wheels
+        uses: actions/download-artifact@v4
+        with:
+          name: wheels-linux-x86_64-unknown-linux-gnu
+          path: dist
+
+      - name: Install wheel
+        run: |
+          python -m pip install --upgrade pip
+          python -m pip install --no-index --find-links=dist taskchampion3-py-dev
+          python -m pip install pytest
+
+      - name: Run tests
+        run: pytest -v
+
   release:
     name: Release
     runs-on: ubuntu-latest
     if: ${{ startsWith(github.ref, 'refs/tags/') || github.event_name == 'workflow_dispatch' }}
-    needs: [linux, musllinux, macos, windows, sdist]
+    needs: [linux, musllinux, macos, windows, sdist, test]
     permissions:
       id-token: write
       contents: write

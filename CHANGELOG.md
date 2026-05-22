@@ -1,6 +1,36 @@
 # Changelog
 
-All notable changes to this project will be documented in this file.
+All notable changes to this project will be documented in this file. The format is
+based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/). Python package
+versions follow a four-component scheme `MAJOR.MINOR.PATCH.PACKAGE-REV[pre]` where
+the first three components mirror the upstream `taskchampion` Rust crate.
+
+## [Unreleased]
+
+### Added
+- CI: new `test` job runs `pytest` against built Linux x86_64 wheels on Python 3.9–3.13;
+  the `release` job now requires `test` to pass.
+- PyPI trove classifiers: Python versions 3.9–3.13, MIT License, Development Status,
+  Operating System, and Topic.
+
+### Changed
+- `chrono` Cargo dependency bounded to `0.4` (was the unbounded `*`).
+
+### Fixed
+- `Task.set_status(Status.Unknown, ops)` now raises `ValueError` instead of silently
+  writing the literal string `"unknown status"` to the underlying task. The original
+  status string is not preserved on read, so writing `Status.Unknown` back was
+  corrupting data. Use `Task.set_value("status", "<value>", ops)` to set a custom
+  status.
+
+## [3.0.1.2a1] - 2026-05-22
+
+### Changed
+- Bumped Python package version to `3.0.1.2a1` (Rust crate target unchanged: `3.0.1`).
+- README: corrected package name reference.
+
+### Fixed
+- CI: Windows build, release job dependency wiring, miscellaneous workflow fixes.
 
 ## [3.0.1.1.dev1] - 2026-05-16
 

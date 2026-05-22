@@ -105,7 +105,7 @@ impl Task {
 
     pub fn set_status(&mut self, status: Status, ops: &mut Operations) -> PyResult<()> {
         self.0
-            .set_status(status.into(), ops.as_mut())
+            .set_status(status.try_into()?, ops.as_mut())
             .map_err(into_runtime_error)
     }
 
