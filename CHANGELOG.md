@@ -29,9 +29,22 @@ the first three components mirror the upstream `taskchampion` Rust crate.
 - CI: new `mypy` job type-checks `taskchampion.pyi` and `tests/` on every push/PR.
 - `taskchampion.pyi`: `Operations` now declares `__iter__` (previously missing despite
   the underlying `#[pyclass(sequence)]` making instances iterable at runtime).
+- `.pre-commit-config.yaml` with hooks for black, ruff, ruff-format, cargo fmt,
+  cargo clippy, and the standard whitespace/EOL checks. Install with
+  `pre-commit install`.
+- `[tool.ruff]` section in `pyproject.toml` (pycodestyle E/W, pyflakes F, isort I,
+  flake8-bugbear B, pyupgrade UP). `tests/*` ignores B018 (false positive on
+  `pytest.raises` blocks inspecting bare expressions).
+- `CONTRIBUTING.md` documenting local setup, lint/test commands, and PR conventions.
+- `SECURITY.md` documenting the vulnerability reporting channel and the weekly
+  `cargo audit` policy.
 
 ### Changed
 - `chrono` Cargo dependency bounded to `0.4` (was the unbounded `*`).
+- `taskchampion.pyi`: stripped unneeded forward-reference quoting (e.g. `"Task"` →
+  `Task`) since `.pyi` evaluation is always deferred; ruff `UP037` cleanup applied
+  across the stub.
+- Test imports sorted by ruff isort (8 files).
 - `mypy.ini`: the `disable_error_code = assignment` suppression is now scoped to
   `[mypy-tests.*]` instead of being global, restoring strict type-checking on
   production code.

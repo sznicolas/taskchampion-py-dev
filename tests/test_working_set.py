@@ -2,6 +2,7 @@ import re
 import uuid
 
 import pytest
+
 from taskchampion import Operations, Replica, Status, WorkingSet
 
 

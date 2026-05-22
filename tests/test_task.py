@@ -2,6 +2,7 @@ import uuid
 from datetime import datetime
 
 import pytest
+
 from taskchampion import Annotation, Operations, Replica, Status, Tag, Task
 
 

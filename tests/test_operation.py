@@ -1,6 +1,7 @@
 from datetime import datetime
 
 import pytest
+
 from taskchampion import Operation
 
 
@@ -28,7 +29,7 @@ def test_delete():
     o = Operation.Delete("10c52749-aec7-4ec9-b390-f371883b9605", {"foo": "bar"})
     assert (
         repr(o)
-        == 'Delete { uuid: 10c52749-aec7-4ec9-b390-f371883b9605, old_task: {"foo": "bar"} }'
+        == 'Delete { uuid: 10c52749-aec7-4ec9-b390-f371883b9605, old_task: {"foo": "bar"} }'  # noqa: E501
     )
     assert not o.is_create()
     assert o.is_delete()
@@ -57,7 +58,7 @@ def test_update():
     )
     assert (
         repr(o)
-        == 'Update { uuid: 10c52749-aec7-4ec9-b390-f371883b9605, property: "foo", old_value: Some("old"), value: Some("new"), timestamp: 2038-01-19T03:14:07Z }'
+        == 'Update { uuid: 10c52749-aec7-4ec9-b390-f371883b9605, property: "foo", old_value: Some("old"), value: Some("new"), timestamp: 2038-01-19T03:14:07Z }'  # noqa: E501
     )
     assert not o.is_create()
     assert not o.is_delete()
@@ -83,7 +84,7 @@ def test_update_none():
     )
     assert (
         repr(o)
-        == 'Update { uuid: 10c52749-aec7-4ec9-b390-f371883b9605, property: "foo", old_value: None, value: None, timestamp: 2038-01-19T03:14:07Z }'
+        == 'Update { uuid: 10c52749-aec7-4ec9-b390-f371883b9605, property: "foo", old_value: None, value: None, timestamp: 2038-01-19T03:14:07Z }'  # noqa: E501
     )
     assert o.old_value is None
     assert o.value is None

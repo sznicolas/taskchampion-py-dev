@@ -1,6 +1,7 @@
 import uuid
 
 import pytest
+
 from taskchampion import Operations, Replica, TaskData
 
 
