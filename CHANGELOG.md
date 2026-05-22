@@ -16,9 +16,17 @@ the first three components mirror the upstream `taskchampion` Rust crate.
   clarification of the PyPI-distribution-name vs Python-module-name distinction, and
   the list of pre-built wheel platforms.
 - Test `test_set_status_unknown_raises` covering the new `Status.Unknown` write rejection.
+- Tests covering previously-unverified Replica APIs: `test_undo` (full
+  `get_undo_operations` + `commit_reversed_operations` round-trip), `test_expire_tasks`,
+  `test_rebuild_working_set`, `test_dependency_map_cached` (`force=False` path).
 - `Annotation` is now hashable (consistent with `Tag`) — instances can be used as
   `set()` elements or `dict` keys.
 - `Operations` implements `Default` (Rust-side; no Python-visible change).
+- CI: new `audit` job (cargo audit via `rustsec/audit-check@v2.0.0`) runs on push/PR
+  and weekly cron (Monday 12h UTC) to catch RustSec advisories on Cargo dependencies.
+- CI: new `mypy` job type-checks `taskchampion.pyi` and `tests/` on every push/PR.
+- `taskchampion.pyi`: `Operations` now declares `__iter__` (previously missing despite
+  the underlying `#[pyclass(sequence)]` making instances iterable at runtime).
 
 ### Removed
 - `Task.into_task_data()` — renamed to `Task.to_task_data()` to match Python naming
@@ -26,6 +34,9 @@ the first three components mirror the upstream `taskchampion` Rust crate.
 
 ### Changed
 - `chrono` Cargo dependency bounded to `0.4` (was the unbounded `*`).
+- `mypy.ini`: the `disable_error_code = assignment` suppression is now scoped to
+  `[mypy-tests.*]` instead of being global, restoring strict type-checking on
+  production code.
 - Wheels are now built against the PyO3 stable ABI (`abi3-py39`). A single wheel
   per platform now covers Python 3.9 and every later 3.x release. Previously,
   macOS and Windows produced only `cp312` wheels.

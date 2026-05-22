@@ -4,6 +4,8 @@ on:
   push:
   pull_request:
     types: [opened, reopened, synchronize]
+  schedule:
+    - cron: '0 12 * * 1'
 
 jobs:
   clippy:
@@ -56,3 +58,30 @@ jobs:
     steps:
       - uses: actions/checkout@v4
       - uses: psf/black@stable
+
+  mypy:
+    runs-on: ubuntu-latest
+    name: "Python Typing"
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+
+      - name: Install mypy
+        run: pip install 'mypy>=1.10.0' pytest
+
+      - name: Type check
+        env:
+          MYPYPATH: .
+        run: mypy --explicit-package-bases taskchampion.pyi tests/
+
+  audit:
+    runs-on: ubuntu-latest
+    name: "Security Audit (cargo audit)"
+    steps:
+      - uses: actions/checkout@v4
+      - uses: rustsec/audit-check@v2.0.0
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}

@@ -157,3 +157,49 @@ def test_get_task_operations(empty_replica: Replica):
     task_ops = empty_replica.get_task_operations(u)
     assert len(task_ops) > 0
     assert any(op.is_create() for op in (task_ops[i] for i in range(len(task_ops))))
+
+
+def test_undo(empty_replica: Replica):
+    u = str(uuid.uuid4())
+
+    ops = Operations()
+    ops.append(Operation.UndoPoint())
+    empty_replica.commit_operations(ops)
+
+    ops = Operations()
+    empty_replica.create_task(u, ops)
+    empty_replica.commit_operations(ops)
+    assert empty_replica.get_task(u) is not None
+
+    undo_ops = empty_replica.get_undo_operations()
+    assert len(undo_ops) > 0
+    assert empty_replica.commit_reversed_operations(undo_ops) is True
+    assert empty_replica.get_task(u) is None
+
+
+def test_expire_tasks(empty_replica: Replica):
+    empty_replica.expire_tasks()
+
+    u = str(uuid.uuid4())
+    ops = Operations()
+    task = empty_replica.create_task(u, ops)
+    task.set_status(Status.Deleted, ops)
+    empty_replica.commit_operations(ops)
+
+    empty_replica.expire_tasks()
+    assert empty_replica.get_task(u) is not None
+
+
+def test_rebuild_working_set(empty_replica: Replica):
+    ops = Operations()
+    t1 = empty_replica.create_task(str(uuid.uuid4()), ops)
+    t1.set_status(Status.Pending, ops)
+    t2 = empty_replica.create_task(str(uuid.uuid4()), ops)
+    t2.set_status(Status.Completed, ops)
+    empty_replica.commit_operations(ops)
+
+    empty_replica.rebuild_working_set(False)
+    assert not empty_replica.working_set().is_empty()
+
+    empty_replica.rebuild_working_set(True)
+    assert not empty_replica.working_set().is_empty()
