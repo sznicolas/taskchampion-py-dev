@@ -19,6 +19,16 @@ the first three components mirror the upstream `taskchampion` Rust crate.
 - Tests covering previously-unverified Replica APIs: `test_undo` (full
   `get_undo_operations` + `commit_reversed_operations` round-trip), `test_expire_tasks`,
   `test_rebuild_working_set`, `test_dependency_map_cached` (`force=False` path).
+- Smoke tests for sync error paths: `test_sync_to_remote_invalid_uuid` (verifies
+  `ValueError` on malformed client_id, no network call) and
+  `test_sync_to_gcp_invalid_credentials` (verifies `RuntimeError` on non-existent
+  credential file path).
+- `.cargo/audit.toml` with documented ignores for advisories that require an
+  upstream `taskchampion` dependency bump to fix (idna 0.5.0, rustls-webpki
+  0.102.x, adler unmaintained, rustls-pemfile unmaintained). The remaining
+  RustSec advisories on transitive deps are expected to be cleared by running
+  `cargo update` to bump within-semver-compatible versions (bytes, ring, time,
+  tokio, futures-util, quinn-proto, rand).
 - `Annotation` is now hashable (consistent with `Tag`) — instances can be used as
   `set()` elements or `dict` keys.
 - `Operations` implements `Default` (Rust-side; no Python-visible change).
@@ -29,7 +39,7 @@ the first three components mirror the upstream `taskchampion` Rust crate.
 - CI: new `mypy` job type-checks `taskchampion.pyi` and `tests/` on every push/PR.
 - `taskchampion.pyi`: `Operations` now declares `__iter__` (previously missing despite
   the underlying `#[pyclass(sequence)]` making instances iterable at runtime).
-- `.pre-commit-config.yaml` with hooks for black, ruff, ruff-format, cargo fmt,
+- `.pre-commit-config.yaml` with hooks for ruff, ruff-format, cargo fmt,
   cargo clippy, and the standard whitespace/EOL checks. Install with
   `pre-commit install`.
 - `[tool.ruff]` section in `pyproject.toml` (pycodestyle E/W, pyflakes F, isort I,
@@ -54,6 +64,14 @@ the first three components mirror the upstream `taskchampion` Rust crate.
 - `Task.__repr__` and `TaskData.__repr__` now produce Python-idiomatic output
   (`Task(uuid=..., description=...)`, `TaskData(uuid=...)`) instead of leaking the
   Rust `Debug` formatter.
+- `Operation.__repr__`, `Operations.__repr__`, `Annotation.__repr__`, `Tag.__repr__`,
+  and `WorkingSet.__repr__` now produce Python-idiomatic output. Examples:
+  `Operation.Create(uuid="...")`, `Operation.UndoPoint()`,
+  `Operations([Operation.Update(...), ...])`,
+  `Annotation(entry="2024-05-07T01:35:57+00:00", description="...")`,
+  `Tag("user_tag")`, `WorkingSet(len=3, largest_index=4)`. `DependencyMap.__repr__`
+  intentionally retains the underlying Rust `Debug` (no public iteration API to
+  enumerate edges).
 - `WorkingSet` iteration is now lazy (yields entries on demand via `by_index`)
   instead of materialising a `Vec` of all entries up front. Iteration semantics
   are unchanged.
@@ -62,13 +80,16 @@ the first three components mirror the upstream `taskchampion` Rust crate.
   macOS and Windows produced only `cp312` wheels.
 - CI: `checks.yml` is now a reusable workflow (`workflow_call`) invoked from
   `ci.yml` as a job. The `release` job now `needs: checks`, so clippy / rustfmt /
-  black / mypy / cargo audit all gate a PyPI publish (previously they could be
-  skipped on tag-only pushes).
-- CI: `psf/black` action pinned to `@25.1.0` instead of the floating `@stable`.
+  ruff (lint + format) / mypy / cargo audit all gate a PyPI publish (previously
+  they could be skipped on tag-only pushes).
 
 ### Removed
 - `Task.into_task_data()` — renamed to `Task.to_task_data()` to match Python naming
   conventions (the method does not consume the task; it produces a copy).
+- `black` as formatter (CI and pre-commit). Replaced by `ruff format`, which
+  implements the same style as black with a single tool. `[tool.black]` removed
+  from `pyproject.toml`; the `Python Formatting (black)` CI job is replaced by
+  `Python Lint & Format (ruff)` which runs both `ruff check` and `ruff format --check`.
 - Workflow `.github/workflows/publish_released_by_ci.yml` deleted. It was
   double-broken (used the deprecated `download-artifact@v4 name:` syntax for a
   cross-workflow download, referenced a non-existent `head_tag` field) and

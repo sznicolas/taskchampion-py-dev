@@ -39,7 +39,11 @@ impl WorkingSet {
     }
 
     pub fn __repr__(&self) -> String {
-        format!("{:?}", self.0)
+        format!(
+            "WorkingSet(len={}, largest_index={})",
+            self.0.len(),
+            self.0.largest_index(),
+        )
     }
 
     pub fn largest_index(&self) -> usize {

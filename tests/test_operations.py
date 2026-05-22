@@ -26,7 +26,7 @@ def test_repr():
     ops = Operations()
     assert repr(ops) == "Operations([])"
     ops.append(Operation.UndoPoint())
-    assert repr(ops) == "Operations([UndoPoint])"
+    assert repr(ops) == "Operations([Operation.UndoPoint()])"
 
 
 def test_len(all_ops: Operations):

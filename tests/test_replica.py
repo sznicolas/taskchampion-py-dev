@@ -204,3 +204,27 @@ def test_rebuild_working_set(empty_replica: Replica):
 
     empty_replica.rebuild_working_set(True)
     assert not empty_replica.working_set().is_empty()
+
+
+def test_sync_to_remote_invalid_uuid(empty_replica: Replica):
+    """Smoke test: sync_to_remote exists, signature accepted, error path works.
+
+    Uses an invalid UUID for client_id, which fails at uuid2tc parse before
+    any network call is made.
+    """
+    with pytest.raises(ValueError):
+        empty_replica.sync_to_remote(
+            "http://example.invalid/", "not-a-valid-uuid", "secret", False
+        )
+
+
+def test_sync_to_gcp_invalid_credentials(empty_replica: Replica):
+    """Smoke test: sync_to_gcp exists, signature accepted, error path works.
+
+    Uses a non-existent credential path, which fails during ServerConfig
+    instantiation before any network call is made.
+    """
+    with pytest.raises(RuntimeError):
+        empty_replica.sync_to_gcp(
+            "no-such-bucket", "/no/such/credentials.json", "secret", False
+        )

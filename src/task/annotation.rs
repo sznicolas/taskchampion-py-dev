@@ -22,7 +22,11 @@ impl Annotation {
     }
 
     pub fn __repr__(&self) -> String {
-        format!("{:?}", self.as_ref())
+        format!(
+            "Annotation(entry={:?}, description={:?})",
+            self.0.entry.to_rfc3339(),
+            self.0.description,
+        )
     }
 
     #[getter]

@@ -1,4 +1,3 @@
-import re
 import uuid
 
 import pytest
@@ -41,9 +40,7 @@ def test_len(working_set: WorkingSet):
 
 
 def test_repr(working_set: WorkingSet):
-    # The Rust Debug output contains lots of internal details that we do not
-    # need to check for here.
-    assert re.match(r"^WorkingSet {.*}$", repr(working_set))
+    assert repr(working_set) == "WorkingSet(len=3, largest_index=4)"
 
 
 def test_largest_index(working_set: WorkingSet):

@@ -4,6 +4,44 @@ use pyo3::{exceptions::PyAttributeError, prelude::*};
 use std::collections::HashMap;
 use taskchampion::Operation as TCOperation;
 
+pub(crate) fn format_operation(op: &TCOperation) -> String {
+    use TCOperation::*;
+    let fmt_opt = |o: &Option<String>| -> String {
+        match o {
+            Some(s) => format!("{s:?}"),
+            None => "None".to_string(),
+        }
+    };
+    match op {
+        Create { uuid } => format!("Operation.Create(uuid={:?})", uuid.to_string()),
+        Delete { uuid, old_task } => {
+            let mut pairs: Vec<(&String, &String)> = old_task.iter().collect();
+            pairs.sort_by(|a, b| a.0.cmp(b.0));
+            let body: Vec<String> = pairs.iter().map(|(k, v)| format!("{k:?}: {v:?}")).collect();
+            format!(
+                "Operation.Delete(uuid={:?}, old_task={{{}}})",
+                uuid.to_string(),
+                body.join(", ")
+            )
+        }
+        Update {
+            uuid,
+            property,
+            old_value,
+            value,
+            timestamp,
+        } => format!(
+            "Operation.Update(uuid={:?}, property={:?}, timestamp={:?}, old_value={}, value={})",
+            uuid.to_string(),
+            property,
+            timestamp.to_rfc3339(),
+            fmt_opt(old_value),
+            fmt_opt(value),
+        ),
+        UndoPoint => "Operation.UndoPoint()".to_string(),
+    }
+}
+
 #[pyclass(from_py_object)]
 #[derive(PartialEq, Eq, Clone, Debug)]
 /// A TaskChampion Operation.
@@ -58,7 +96,7 @@ impl Operation {
     }
 
     pub fn __repr__(&self) -> String {
-        format!("{:?}", self.0)
+        format_operation(&self.0)
     }
 
     pub fn is_create(&self) -> bool {

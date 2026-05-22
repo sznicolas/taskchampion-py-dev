@@ -19,7 +19,7 @@ impl Tag {
     }
 
     pub fn __repr__(&self) -> String {
-        format!("{:?}", self.0)
+        format!("Tag({:?})", self.0.to_string())
     }
 
     pub fn __str__(&self) -> String {

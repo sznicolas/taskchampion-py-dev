@@ -1,3 +1,4 @@
+use crate::operation::format_operation;
 use crate::Operation;
 use pyo3::{
     exceptions::{PyIndexError, PyTypeError},
@@ -26,7 +27,8 @@ impl Operations {
     }
 
     pub fn __repr__(&self) -> String {
-        format!("{:?}", self)
+        let body: Vec<String> = self.0.iter().map(format_operation).collect();
+        format!("Operations([{}])", body.join(", "))
     }
 
     pub fn __len__(&self) -> usize {
