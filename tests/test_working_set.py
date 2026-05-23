@@ -1,8 +1,8 @@
-from taskchampion import Replica, WorkingSet, Status, Operations
-from pathlib import Path
-import pytest
-import re
 import uuid
+
+import pytest
+
+from taskchampion import Operations, Replica, Status, WorkingSet
 
 
 @pytest.fixture
@@ -40,9 +40,7 @@ def test_len(working_set: WorkingSet):
 
 
 def test_repr(working_set: WorkingSet):
-    # The Rust Debug output contains lots of internal details that we do not
-    # need to check for here.
-    assert re.match(r"^WorkingSet {.*}$", repr(working_set))
+    assert repr(working_set) == "WorkingSet(len=3, largest_index=4)"
 
 
 def test_largest_index(working_set: WorkingSet):
@@ -56,14 +54,14 @@ def test_is_empty(working_set: WorkingSet):
 def test_by_index(working_set: WorkingSet, uuids: list[str]):
     assert working_set.by_index(1) == uuids[1]
     assert working_set.by_index(2) == uuids[2]
-    assert working_set.by_index(3) == None
+    assert working_set.by_index(3) is None
     assert working_set.by_index(4) == uuids[4]
 
 
 def test_by_uuid(working_set: WorkingSet, uuids: list[str]):
     assert working_set.by_uuid(uuids[1]) == 1
     assert working_set.by_uuid(uuids[2]) == 2
-    assert working_set.by_uuid(uuids[3]) == None
+    assert working_set.by_uuid(uuids[3]) is None
     assert working_set.by_uuid(uuids[4]) == 4
 
 

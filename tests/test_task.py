@@ -1,8 +1,9 @@
-import re
-from taskchampion import Task, Replica, Status, Tag, Operations, Annotation
-from datetime import datetime
-import pytest
 import uuid
+from datetime import datetime
+
+import pytest
+
+from taskchampion import Annotation, Operations, Replica, Status, Tag, Task
 
 
 @pytest.fixture
@@ -126,7 +127,7 @@ def uda_task(replica: Replica, uda_task_uuid: str):
     task = replica.create_task(uda_task_uuid, ops)
     task.set_description("a task", ops)
     task.set_status(Status.Pending, ops)
-    task.set_uda("ns", "key", "val", ops)
+    task.set_user_defined_attribute("ns.key", "val", ops)
     replica.commit_operations(ops)
     return task
 
@@ -142,19 +143,20 @@ def legacy_uda_task(replica: Replica, legacy_uda_task_uuid: str):
     task = replica.create_task(legacy_uda_task_uuid, ops)
     task.set_description("a task", ops)
     task.set_status(Status.Pending, ops)
-    task.set_legacy_uda("legacy-key", "legacy-val", ops)
+    task.set_user_defined_attribute("legacy-key", "legacy-val", ops)
     replica.commit_operations(ops)
     return task
 
 
-def test_repr(new_task: Task):
-    # The Rust Debug output contains lots of internal details that we do not
-    # need to check for here.
-    assert re.match(r"^Task { .* }$", repr(new_task))
+def test_repr(new_task: Task, new_task_uuid: str):
+    r = repr(new_task)
+    assert r.startswith("Task(uuid=")
+    assert new_task_uuid in r
+    assert 'description="a task"' in r
 
 
-def test_into_task_data(new_task: Task, new_task_uuid: str):
-    new_task = new_task.into_task_data()
+def test_to_task_data(new_task: Task, new_task_uuid: str):
+    new_task = new_task.to_task_data()
     assert new_task.get_uuid() == new_task_uuid
 
 
@@ -165,6 +167,12 @@ def test_get_uuid(new_task: Task, new_task_uuid: str):
 def test_get_set_status(new_task: Task):
     status = new_task.get_status()
     assert status == Status.Pending
+
+
+def test_set_status_unknown_raises(new_task: Task):
+    ops = Operations()
+    with pytest.raises(ValueError, match="Status.Unknown"):
+        new_task.set_status(Status.Unknown, ops)
 
 
 def test_get_set_description(new_task: Task):
@@ -185,7 +193,7 @@ def test_get_set_entry_none(replica: Replica, new_task: Task):
     new_task.set_entry(None, ops)
     replica.commit_operations(ops)
     new_task = replica.get_task(new_task.get_uuid())
-    assert new_task.get_entry() == None
+    assert new_task.get_entry() is None
 
 
 def test_get_set_priority(waiting_task: Task):
@@ -286,45 +294,48 @@ def test_remove_annotation(
 
 
 def test_get_udas(uda_task: Task):
-    [((ns, key), val)] = uda_task.get_udas()
-    assert ns == "ns"
-    assert key == "key"
+    [(key, val)] = uda_task.get_user_defined_attributes()
+    assert key == "ns.key"
     assert val == "val"
 
 
+def test_get_uda_single(uda_task: Task):
+    assert uda_task.get_user_defined_attribute("ns.key") == "val"
+    assert uda_task.get_user_defined_attribute("missing") is None
+
+
 def test_get_udas_legacy(legacy_uda_task: Task):
-    [((ns, key), val)] = legacy_uda_task.get_udas()
-    assert ns == ""
+    [(key, val)] = legacy_uda_task.get_user_defined_attributes()
     assert key == "legacy-key"
     assert val == "legacy-val"
 
 
 def test_get_udas_none(new_task: Task):
-    [] = new_task.get_udas()
+    assert new_task.get_user_defined_attributes() == []
 
 
 def test_remove_uda(replica: Replica, uda_task: Task):
     ops = Operations()
-    uda_task.remove_uda("ns", "key", ops)
+    uda_task.remove_user_defined_attribute("ns.key", ops)
     replica.commit_operations(ops)
     uda_task = replica.get_task(uda_task.get_uuid())
-    [] = uda_task.get_udas()
+    assert uda_task.get_user_defined_attributes() == []
 
 
 def test_remove_uda_no_such(replica: Replica, uda_task: Task):
     ops = Operations()
-    uda_task.remove_uda("no", "such", ops)
+    uda_task.remove_user_defined_attribute("no.such", ops)
     replica.commit_operations(ops)
     uda_task = replica.get_task(uda_task.get_uuid())
-    assert len(uda_task.get_udas()) == 1
+    assert len(uda_task.get_user_defined_attributes()) == 1
 
 
 def test_remove_legacy_uda(replica: Replica, legacy_uda_task: Task):
     ops = Operations()
-    legacy_uda_task.remove_legacy_uda("legacy-key", ops)
+    legacy_uda_task.remove_user_defined_attribute("legacy-key", ops)
     replica.commit_operations(ops)
     legacy_uda_task = replica.get_task(legacy_uda_task.get_uuid())
-    [] = legacy_uda_task.get_udas()
+    assert legacy_uda_task.get_user_defined_attributes() == []
 
 
 def test_get_modified(replica: Replica, new_task: Task):
@@ -335,11 +346,11 @@ def test_get_modified(replica: Replica, new_task: Task):
     assert new_task.get_modified() == mod
 
 
-def test_get_modified_not_set(replica: Replica, new_task_uuid: Task):
+def test_get_modified_not_set(replica: Replica, new_task_uuid: str):
     ops = Operations()
     task = replica.create_task(new_task_uuid, ops)
     replica.commit_operations(ops)
-    assert task.get_modified() == None
+    assert task.get_modified() is None
 
 
 def test_get_due(due_task: Task):
@@ -347,7 +358,7 @@ def test_get_due(due_task: Task):
 
 
 def test_get_due_not_set(new_task: Task):
-    assert new_task.get_due() == None
+    assert new_task.get_due() is None
 
 
 def test_set_due(replica: Replica, new_task: Task):
@@ -362,7 +373,7 @@ def test_set_due_none(replica: Replica, new_task: Task):
     ops = Operations()
     new_task.set_due(None, ops)
     replica.commit_operations(ops)
-    assert new_task.get_due() == None
+    assert new_task.get_due() is None
 
 
 def test_get_dependencies(
@@ -393,7 +404,7 @@ def test_get_value(new_task: Task):
 
 
 def test_get_value_not_set(new_task: Task):
-    assert new_task.get_value("nosuchthing") == None
+    assert new_task.get_value("nosuchthing") is None
 
 
 def test_start_stop(replica: Replica, new_task: Task):

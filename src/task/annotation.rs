@@ -2,10 +2,17 @@ use chrono::{DateTime, Utc};
 use pyo3::prelude::*;
 use taskchampion::Annotation as TCAnnotation;
 
-#[pyclass(from_py_object, frozen, eq)]
+#[pyclass(from_py_object, frozen, eq, hash)]
 #[derive(Clone, PartialEq, Eq)]
 /// An annotation for the task
 pub struct Annotation(TCAnnotation);
+
+impl std::hash::Hash for Annotation {
+    fn hash<H: std::hash::Hasher>(&self, state: &mut H) {
+        self.0.entry.hash(state);
+        self.0.description.hash(state);
+    }
+}
 
 #[pymethods]
 impl Annotation {
@@ -15,7 +22,11 @@ impl Annotation {
     }
 
     pub fn __repr__(&self) -> String {
-        format!("{:?}", self.as_ref())
+        format!(
+            "Annotation(entry={:?}, description={:?})",
+            self.0.entry.to_rfc3339(),
+            self.0.description,
+        )
     }
 
     #[getter]

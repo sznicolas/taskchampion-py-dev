@@ -1,4 +1,4 @@
-use pyo3::prelude::*;
+use pyo3::{exceptions::PyValueError, prelude::*};
 pub use taskchampion::Status as TCStatus;
 
 #[pyclass(from_py_object, eq, eq_int)]
@@ -8,8 +8,9 @@ pub enum Status {
     Completed,
     Deleted,
     Recurring,
-    // IMPORTANT: #[pyclass] only supports unit variants, so cannot keep the
-    // string form of this status.
+    // Read-only sentinel. `TCStatus::Unknown(String)` carries a free-form
+    // string that this unit-only enum cannot represent; writing back via
+    // `Status::Unknown` is rejected by `TryFrom` to avoid silent corruption.
     Unknown,
 }
 
@@ -25,14 +26,19 @@ impl From<TCStatus> for Status {
     }
 }
 
-impl From<Status> for TCStatus {
-    fn from(status: Status) -> Self {
+impl TryFrom<Status> for TCStatus {
+    type Error = PyErr;
+
+    fn try_from(status: Status) -> Result<Self, Self::Error> {
         match status {
-            Status::Pending => TCStatus::Pending,
-            Status::Completed => TCStatus::Completed,
-            Status::Deleted => TCStatus::Deleted,
-            Status::Recurring => TCStatus::Recurring,
-            Status::Unknown => TCStatus::Unknown("unknown status".to_string()),
+            Status::Pending => Ok(TCStatus::Pending),
+            Status::Completed => Ok(TCStatus::Completed),
+            Status::Deleted => Ok(TCStatus::Deleted),
+            Status::Recurring => Ok(TCStatus::Recurring),
+            Status::Unknown => Err(PyValueError::new_err(
+                "Status.Unknown cannot be set: the original status string is not preserved on read. \
+                 Use Task.set_value(\"status\", \"<value>\", ops) to set a custom status.",
+            )),
         }
     }
 }

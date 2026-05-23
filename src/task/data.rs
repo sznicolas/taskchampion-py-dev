@@ -14,7 +14,8 @@ impl TaskData {
     }
 
     pub fn __repr__(&self) -> String {
-        format!("{:?}", self.0)
+        let uuid: String = self.0.get_uuid().into();
+        format!("TaskData(uuid={uuid:?})")
     }
 
     pub fn get_uuid(&self) -> String {
@@ -27,6 +28,14 @@ impl TaskData {
 
     pub fn has(&self, value: String) -> bool {
         self.0.has(value)
+    }
+
+    pub fn properties(&self) -> Vec<String> {
+        self.0.properties().cloned().collect()
+    }
+
+    pub fn items(&self) -> Vec<(String, String)> {
+        self.0.iter().map(|(k, v)| (k.clone(), v.clone())).collect()
     }
 
     #[pyo3(signature=(property, value, ops))]

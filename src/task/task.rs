@@ -14,11 +14,14 @@ pub struct Task(TCTask);
 #[pymethods]
 impl Task {
     fn __repr__(&self) -> String {
-        format!("{:?}", self.as_ref())
+        format!(
+            "Task(uuid={:?}, description={:?})",
+            self.0.get_uuid().to_string(),
+            self.0.get_description(),
+        )
     }
 
-    #[allow(clippy::wrong_self_convention)]
-    pub fn into_task_data(&self) -> TaskData {
+    pub fn to_task_data(&self) -> TaskData {
         self.0.clone().into_task_data().into()
     }
 
@@ -74,12 +77,14 @@ impl Task {
         self.0.get_annotations().map(Annotation::from).collect()
     }
 
-    pub fn get_uda(&self, namespace: &str, key: &str) -> Option<&str> {
-        self.0.get_uda(namespace, key)
+    /// Get the named user-defined attribute (UDA). Returns `None` for task model keys.
+    pub fn get_user_defined_attribute(&self, key: &str) -> Option<&str> {
+        self.0.get_user_defined_attribute(key)
     }
 
-    pub fn get_udas(&self) -> Vec<((&str, &str), &str)> {
-        self.0.get_udas().collect()
+    /// Get all user-defined attributes (UDAs) as a list of `(key, value)` tuples.
+    pub fn get_user_defined_attributes(&self) -> Vec<(&str, &str)> {
+        self.0.get_user_defined_attributes().collect()
     }
 
     pub fn get_modified(&self) -> Option<DateTime<Utc>> {
@@ -103,7 +108,7 @@ impl Task {
 
     pub fn set_status(&mut self, status: Status, ops: &mut Operations) -> PyResult<()> {
         self.0
-            .set_status(status.into(), ops.as_mut())
+            .set_status(status.try_into()?, ops.as_mut())
             .map_err(into_runtime_error)
     }
 
@@ -203,43 +208,26 @@ impl Task {
             .map_err(into_runtime_error)
     }
 
-    pub fn set_uda(
-        &mut self,
-        namespace: String,
-        key: String,
-        value: String,
-        ops: &mut Operations,
-    ) -> PyResult<()> {
-        self.0
-            .set_uda(namespace, key, value, ops.as_mut())
-            .map_err(into_runtime_error)
-    }
-
-    pub fn remove_uda(
-        &mut self,
-        namespace: String,
-        key: String,
-        ops: &mut Operations,
-    ) -> PyResult<()> {
-        self.0
-            .remove_uda(namespace, key, ops.as_mut())
-            .map_err(into_runtime_error)
-    }
-
-    pub fn set_legacy_uda(
+    /// Set a user-defined attribute (UDA). Fails if `key` is a reserved task model property.
+    pub fn set_user_defined_attribute(
         &mut self,
         key: String,
         value: String,
         ops: &mut Operations,
     ) -> PyResult<()> {
         self.0
-            .set_legacy_uda(key, value, ops.as_mut())
+            .set_user_defined_attribute(key, value, ops.as_mut())
             .map_err(into_runtime_error)
     }
 
-    pub fn remove_legacy_uda(&mut self, key: String, ops: &mut Operations) -> PyResult<()> {
+    /// Remove a user-defined attribute (UDA). Fails if `key` is a reserved task model property.
+    pub fn remove_user_defined_attribute(
+        &mut self,
+        key: String,
+        ops: &mut Operations,
+    ) -> PyResult<()> {
         self.0
-            .remove_legacy_uda(key, ops.as_mut())
+            .remove_user_defined_attribute(key, ops.as_mut())
             .map_err(into_runtime_error)
     }
 

@@ -5,8 +5,23 @@ It follows the TaskChampion API closely, with minimal adaptation for Python.
 
 ## Versioning
 
-The `taskchampion-py` package version matches the Rust crate's version.
-When an additional package release is required for the same Rust crate, a fourth version component is used; for example `1.2.0.1` for the second release of `taskchampion-py` containing TaskChampion version `1.2.0`.
+The `taskchampion-py` package version generally follows the Rust crate version. This fork publishes as `taskchampion3-py-dev` with Python package version `3.0.1.2` corresponding to TaskChampion crate `3.0.1`. The fork remains on the `3.0.1.x` line as long as upstream `taskchampion` stays on `3.0.1`; the `3.0.2.x` line will track upstream `taskchampion 3.0.2` when it ships. The fourth version component is the package-only revision (build/packaging fixes that do not change the wrapped Rust crate).
+
+## Installation
+
+Install from PyPI:
+
+```shell
+pip install taskchampion3-py-dev
+```
+
+The PyPI distribution name is `taskchampion3-py-dev`, but the importable Python module is `taskchampion`:
+
+```python
+import taskchampion
+```
+
+Pre-built wheels are published for CPython and PyPy on Python 3.9–3.13, covering Linux (glibc and musl: x86_64, aarch64, armv7, i686, s390x, ppc64le), macOS (Intel and Apple Silicon), and Windows (x86, x64). If no wheel matches your platform, pip will fall back to the sdist, which requires a Rust toolchain ≥ 1.91.1.
 
 ## Usage
 
@@ -25,7 +40,7 @@ def main():
 if __name__ == "__main__":
     main()
 ```
-For the Replica.new_on_disk(path), the argument is directory to your sqlite database (to match the Rust implementation). For a thorough understanding of the Rust implementation, which this Python package emulates, see the Rust documentation at: https://docs.rs/taskchampion/2.0.3/taskchampion/
+For the Replica.new_on_disk(path), the argument is directory to your sqlite database (to match the Rust implementation). For a thorough understanding of the Rust implementation, which this Python package emulates, see the Rust documentation at: https://docs.rs/taskchampion/3.0.1/taskchampion/
 
 The output of r.all_tasks() is a dictionary. The keys are the UUIDs of the tasks. Here is an example based on a couple test tasks:
 
@@ -67,19 +82,16 @@ This stores wheels in the `target/wheels` folder by default.
 
 ### Testing
 
-Extra testing dependencies are installed via `poetry`:
-```shell
-poetry install
-```
+Extra testing dependencies can be installed with pip. To run tests locally:
 
-To run tests:
-```shell
-poetry shell
-maturin develop
+```bash
+python3.12 -m venv .venv && source .venv/bin/activate
+python -m pip install --upgrade pip
+pip install maturin pytest mypy
+# Build and install extension in editable mode
+maturin develop --release
+# Run tests
 pytest
 ```
-or
-```shell
-poetry run maturin develop
-poetry run pytest
-```
+
+To reproduce the CI environment (ubuntu-latest) use the Docker recipe in the CONTRIBUTING or CI docs.

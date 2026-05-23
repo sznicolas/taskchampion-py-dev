@@ -1,8 +1,8 @@
-import re
-from taskchampion import Replica, TaskData, Operations
-from datetime import datetime
-import pytest
 import uuid
+
+import pytest
+
+from taskchampion import Operations, Replica, TaskData
 
 
 @pytest.fixture
@@ -38,7 +38,7 @@ def recurring_task_data(replica: Replica, recurring_task_uuid: str) -> TaskData:
 
 
 def test_taskdata_repr(new_task_data: TaskData, new_task_uuid: str):
-    assert repr(new_task_data) == f"TaskData {{ uuid: {new_task_uuid}, taskmap: {{}} }}"
+    assert repr(new_task_data) == f'TaskData(uuid="{new_task_uuid}")'
 
 
 def test_taskdata_get_uuid(new_task_data: TaskData, new_task_uuid: str):
@@ -50,7 +50,7 @@ def test_taskdata_get(recurring_task_data: TaskData):
 
 
 def test_taskdata_get_not_set(new_task_data: TaskData):
-    assert new_task_data.get("status") == None
+    assert new_task_data.get("status") is None
 
 
 def test_taskdata_has(recurring_task_data: TaskData):
@@ -74,7 +74,7 @@ def test_taskdata_update_none(replica: Replica, recurring_task_data: TaskData):
     recurring_task_data.update("status", None, ops)
     replica.commit_operations(ops)
 
-    assert recurring_task_data.get("status") == None
+    assert recurring_task_data.get("status") is None
 
 
 def test_taskdata_delete(replica: Replica, new_task_data: TaskData, new_task_uuid: str):
@@ -83,4 +83,13 @@ def test_taskdata_delete(replica: Replica, new_task_data: TaskData, new_task_uui
     replica.commit_operations(ops)
 
     deleted_task = replica.get_task(new_task_uuid)
-    assert deleted_task == None
+    assert deleted_task is None
+
+
+def test_taskdata_properties(recurring_task_data: TaskData):
+    assert "status" in recurring_task_data.properties()
+
+
+def test_taskdata_items(recurring_task_data: TaskData):
+    items = dict(recurring_task_data.items())
+    assert items["status"] == "recurring"

@@ -1,4 +1,5 @@
 import pytest
+
 from taskchampion import Tag
 
 
@@ -20,8 +21,8 @@ def test_invalid():
 
 
 def test_repr(user_tag, synthetic_tag):
-    assert repr(user_tag) == 'Tag(User("user_tag"))'
-    assert repr(synthetic_tag) == "Tag(Synthetic(Unblocked))"
+    assert repr(user_tag) == 'Tag("user_tag")'
+    assert repr(synthetic_tag) == 'Tag("UNBLOCKED")'
 
 
 def test_str(user_tag, synthetic_tag):

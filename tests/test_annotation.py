@@ -1,5 +1,7 @@
-import pytest
 from datetime import datetime
+
+import pytest
+
 from taskchampion import Annotation
 
 
@@ -20,7 +22,7 @@ def test_entry(entry, annotation):
 def test_repr(entry, annotation):
     assert (
         repr(annotation)
-        == 'Annotation { entry: 2024-05-07T01:35:57Z, description: "descr" }'
+        == 'Annotation(entry="2024-05-07T01:35:57+00:00", description="descr")'
     )
 
 

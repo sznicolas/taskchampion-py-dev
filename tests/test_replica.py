@@ -2,7 +2,8 @@ import uuid
 from pathlib import Path
 
 import pytest
-from taskchampion import Replica, Operations, Operation, AccessMode
+
+from taskchampion import AccessMode, Operation, Operations, Replica, Status
 
 
 @pytest.fixture
@@ -118,3 +119,112 @@ def test_num_undo_points(replica_with_tasks: Replica):
     replica_with_tasks.commit_operations(ops)
 
     assert replica_with_tasks.num_undo_points() == 1
+
+
+def test_pending_tasks(empty_replica: Replica):
+    ops = Operations()
+    t1 = empty_replica.create_task(str(uuid.uuid4()), ops)
+    t1.set_status(Status.Pending, ops)
+    t2 = empty_replica.create_task(str(uuid.uuid4()), ops)
+    t2.set_status(Status.Completed, ops)
+    empty_replica.commit_operations(ops)
+
+    pending = empty_replica.pending_tasks()
+    assert len(pending) == 1
+    assert pending[0].get_uuid() == t1.get_uuid()
+
+
+def test_pending_task_data(empty_replica: Replica):
+    ops = Operations()
+    t1 = empty_replica.create_task(str(uuid.uuid4()), ops)
+    t1.set_status(Status.Pending, ops)
+    t2 = empty_replica.create_task(str(uuid.uuid4()), ops)
+    t2.set_status(Status.Completed, ops)
+    empty_replica.commit_operations(ops)
+
+    pending = empty_replica.pending_task_data()
+    assert len(pending) == 1
+    assert pending[0].get_uuid() == t1.get_uuid()
+
+
+def test_get_task_operations(empty_replica: Replica):
+    u = str(uuid.uuid4())
+    ops = Operations()
+    t = empty_replica.create_task(u, ops)
+    t.set_status(Status.Pending, ops)
+    t.set_description("hello", ops)
+    empty_replica.commit_operations(ops)
+
+    task_ops = empty_replica.get_task_operations(u)
+    assert len(task_ops) > 0
+    assert any(op.is_create() for op in (task_ops[i] for i in range(len(task_ops))))
+
+
+def test_undo(empty_replica: Replica):
+    u = str(uuid.uuid4())
+
+    ops = Operations()
+    ops.append(Operation.UndoPoint())
+    empty_replica.commit_operations(ops)
+
+    ops = Operations()
+    empty_replica.create_task(u, ops)
+    empty_replica.commit_operations(ops)
+    assert empty_replica.get_task(u) is not None
+
+    undo_ops = empty_replica.get_undo_operations()
+    assert len(undo_ops) > 0
+    assert empty_replica.commit_reversed_operations(undo_ops) is True
+    assert empty_replica.get_task(u) is None
+
+
+def test_expire_tasks(empty_replica: Replica):
+    empty_replica.expire_tasks()
+
+    u = str(uuid.uuid4())
+    ops = Operations()
+    task = empty_replica.create_task(u, ops)
+    task.set_status(Status.Deleted, ops)
+    empty_replica.commit_operations(ops)
+
+    empty_replica.expire_tasks()
+    assert empty_replica.get_task(u) is not None
+
+
+def test_rebuild_working_set(empty_replica: Replica):
+    ops = Operations()
+    t1 = empty_replica.create_task(str(uuid.uuid4()), ops)
+    t1.set_status(Status.Pending, ops)
+    t2 = empty_replica.create_task(str(uuid.uuid4()), ops)
+    t2.set_status(Status.Completed, ops)
+    empty_replica.commit_operations(ops)
+
+    empty_replica.rebuild_working_set(False)
+    assert not empty_replica.working_set().is_empty()
+
+    empty_replica.rebuild_working_set(True)
+    assert not empty_replica.working_set().is_empty()
+
+
+def test_sync_to_remote_invalid_uuid(empty_replica: Replica):
+    """Smoke test: sync_to_remote exists, signature accepted, error path works.
+
+    Uses an invalid UUID for client_id, which fails at uuid2tc parse before
+    any network call is made.
+    """
+    with pytest.raises(ValueError):
+        empty_replica.sync_to_remote(
+            "http://example.invalid/", "not-a-valid-uuid", "secret", False
+        )
+
+
+def test_sync_to_gcp_invalid_credentials(empty_replica: Replica):
+    """Smoke test: sync_to_gcp exists, signature accepted, error path works.
+
+    Uses a non-existent credential path, which fails during ServerConfig
+    instantiation before any network call is made.
+    """
+    with pytest.raises(RuntimeError):
+        empty_replica.sync_to_gcp(
+            "no-such-bucket", "/no/such/credentials.json", "secret", False
+        )
